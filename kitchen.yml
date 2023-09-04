@@ -1,0 +1,25 @@
+---
+driver:
+  name: terraform
+
+provisioner:
+  name: terraform
+
+platforms:
+  - name: local
+
+verifier:
+  name: terraform
+
+suites:
+  - name: default-<%= ENV['pipeline_id'] %>
+    driver:
+      root_module_directory: examples/default
+      variables:
+        env: <%= ENV['pipeline_id'] %>
+    verifier:
+      systems:
+        - name: default
+          backend: local
+          attrs:
+            - test/integration/default/attrs.yml

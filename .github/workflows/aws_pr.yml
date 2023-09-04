@@ -1,0 +1,30 @@
+---
+name: AWS
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - edited
+      - synchronize
+env:
+  AWS_REGION: "eu-west-1"
+permissions:
+  id-token: write   # This is required for requesting the JWT
+  contents: read    # This is required for actions/checkout
+jobs:
+  check-credentials:
+    name: Test Credentials
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+    steps:
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::804076245636:role/GitHubOIDC
+          role-session-name: github-actions
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Test AWS Credentials
+        uses: docker://amazon/aws-cli
+        with:
+          args: ec2 describe-availability-zones --region us-east-1

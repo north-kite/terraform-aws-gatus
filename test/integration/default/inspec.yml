@@ -1,0 +1,5 @@
+---
+name: default
+inputs:
+  - name: terraform_output
+    type: string
