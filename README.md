@@ -20,3 +20,5 @@ Template includes the following GitHub Actions:
 TODO:
 - add GitHub Actions for:
   - Kitchen Terraform (option to enable)
+- add key/value map of env vars and secrets to be used in config
+- add make entry for container build and push
