@@ -6,6 +6,7 @@ resource "aws_security_group" "gatus_alb" {
 }
 
 resource "aws_security_group_rule" "gatus_alb_ingress" {
+  description       = "Traffic allowed to access status page via ALB"
   type              = "ingress"
   from_port         = var.alb_listener_config.port
   to_port           = var.alb_listener_config.port
@@ -15,6 +16,7 @@ resource "aws_security_group_rule" "gatus_alb_ingress" {
 }
 
 resource "aws_security_group_rule" "gatus_alb_egress" {
+  description              = "ALB to Gatus container traffic"
   type                     = "egress"
   from_port                = 8080
   to_port                  = 8080
@@ -31,6 +33,7 @@ resource "aws_lb" "alb" {
   subnets                          = var.subnets
   enable_cross_zone_load_balancing = true
   security_groups                  = [var.alb == null ? aws_security_group.gatus_alb[0].id : var.alb.security_group_id]
+  drop_invalid_header_fields       = true
 
   tags = {
     Name = format("%s-%s", local.name, "gatus")

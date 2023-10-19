@@ -33,11 +33,11 @@
   "secrets": [
     {
       "name": "DB_USER",
-      "valueFrom": "${database.user}"
+      "valueFrom": "${database.user_arn}"
     },
     {
       "name": "DB_PASSWORD",
-      "valueFrom": "${database.password}"
+      "valueFrom": "${database.password_arn}"
     }
   ],
   %{ endif }
