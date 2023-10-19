@@ -8,13 +8,13 @@ resource "aws_ecs_task_definition" "gatus" {
   execution_role_arn       = var.execution_role_arn
 
   container_definitions = templatefile("${path.module}/templates/gatus.tpl", {
-    image     = var.image
-    cpu       = var.cpu
-    memory    = var.memory
-    name      = "${local.name}-gatus"
-    log_group = var.log_group != null ? var.log_group.arn : ""
-    region    = var.log_group != null ? var.log_group.region : ""
-    database  = var.database
+    image       = var.image
+    cpu         = var.cpu
+    memory      = var.memory
+    name        = "${local.name}-gatus"
+    log_group   = var.log_group != null ? var.log_group.arn : ""
+    region      = var.log_group != null ? var.log_group.region : ""
+    database    = var.database
     config_path = var.config_path
   })
 }
@@ -26,21 +26,13 @@ resource "aws_security_group" "gatus" {
 }
 
 resource "aws_security_group_rule" "gatus_ingress_from_alb" {
+  description              = "ALB to Gatus container traffic"
   type                     = "ingress"
   from_port                = var.alb_listener_config.port
   to_port                  = var.alb_listener_config.port
   protocol                 = "all"
   security_group_id        = aws_security_group.gatus.id
   source_security_group_id = var.alb == null ? aws_security_group.gatus_alb[0].id : var.alb.security_group_id
-}
-
-resource "aws_security_group_rule" "gatus_egress" {
-  type              = "egress"
-  from_port         = 0
-  to_port           = 65535
-  protocol          = "all"
-  security_group_id = aws_security_group.gatus.id
-  cidr_blocks       = ["0.0.0.0/0"] # TODO
 }
 
 resource "aws_ecs_service" "gatus" {

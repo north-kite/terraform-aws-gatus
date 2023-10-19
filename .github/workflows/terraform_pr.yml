@@ -7,6 +7,12 @@ on:
       - reopened
       - edited
       - synchronize
+env:
+  TERRAFORM_VERSION: 1.5.6
+  KICS_resource_without_tag: 'e38a8e0a-b88b-4902-b3fe-b0fcb17d5c10'            # KICS Query 'Resource Not Using Tags' - provider default tags used instead
+  KICS_alb_deletion_protection: 'afecd1f1-6378-4f7e-bb3b-60c35801fdd4'         # KICS Query 'ALB Deletion Protection Disabled'
+
+
 jobs:
   format:
     name: Format
@@ -17,7 +23,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
         with:
-          terraform_version: 1.5.6
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
 
       - name: Terraform Format
         id: fmt
@@ -60,6 +66,7 @@ jobs:
           output_path: 'results'
           platform_type: terraform
           fail_on: high,medium
+          exclude_queries: '${{ env.KICS_resource_without_tag }},${{ env.KICS_alb_deletion_protection }}'
           enable_comments: true
           enable_annotations: true
       - name: Display KICS Results

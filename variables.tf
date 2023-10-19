@@ -23,6 +23,18 @@ variable "subnets" {
   type        = set(string)
 }
 
+variable "alb_listener_config" {
+  description = "Map of config for application load balancer listeners"
+  type = object({
+    port                = number
+    health_check_port   = number
+    protocol            = string # HTTP or HTTPS
+    allowed_cidr_blocks = list(string)
+    certificate_arn     = string # required if protocol is HTTPS
+    path                = string
+  })
+}
+
 # Optional Variables
 variable "service_name" {
   description = "(Optional) Name of the service/product/application this Gatus belongs to"
@@ -68,26 +80,6 @@ variable "security_groups" {
   default     = []
 }
 
-variable "alb_listener_config" {
-  description = "(Optional) Map of config for application load balancer listeners"
-  type = object({
-    port                = number
-    health_check_port   = number
-    protocol            = string # HTTP or HTTPS
-    allowed_cidr_blocks = list(string)
-    certificate_arn     = string # required if protocol is HTTPS
-    path                = string
-  })
-  default = {
-    port                = 80
-    health_check_port   = 80
-    protocol            = "HTTP"
-    allowed_cidr_blocks = ["0.0.0.0/0"]
-    certificate_arn     = ""
-    path                = "/"
-  }
-}
-
 variable "cpu" {
   description = "(Optional) CPU to allocate to each Gatus"
   type        = number
@@ -119,7 +111,7 @@ variable "image" {
 variable "config_path" {
   description = "(Optional) File location of config files within container"
   type        = string
-  default = "/config/"
+  default     = "/config/"
 }
 
 variable "log_group" {
@@ -155,11 +147,11 @@ variable "public" {
 variable "database" {
   description = "(Optional) Database name and connection details. If set, these will be added to container environment variables for use in Gatus config. ARNs of Secret Manager secrets or Parameter Store parameters should be provided for `user` and `password`."
   type = object({
-    host     = string
-    port     = number
-    name     = string
-    user     = string
-    password = string
+    host         = string
+    port         = number
+    name         = string
+    user_arn     = string
+    password_arn = string
   })
   default = null
 }
