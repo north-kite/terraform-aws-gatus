@@ -1,7 +1,8 @@
 module "example" {
   source = "../../"
 
-  env = var.env
+  env   = var.env
+  image = docker_registry_image.gatus.name
   ecs_cluster = {
     arn  = aws_ecs_cluster.default.arn
     name = aws_ecs_cluster.default.name
