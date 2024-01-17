@@ -1,3 +1,28 @@
+locals {
+  env_vars = merge(
+    {
+      GATUS_CONFIG_PATH = var.config_path
+    },
+    var.env_vars,
+    var.database != null ? (
+    {
+      DB_HOST = var.database.host
+      DB_PORT = var.database.port
+      DB_NAME = var.database.name
+    }
+    ) : {},
+  )
+  secrets = merge(
+    var.secrets,
+    var.database != null ? (
+    {
+      DB_USER = var.database.user_arn
+      DB_PASSWORD = var.database.password_arn
+    }
+    ) : {},
+  )
+}
+
 resource "aws_ecs_task_definition" "gatus" {
   family                   = local.name
   network_mode             = "awsvpc"
@@ -7,16 +32,54 @@ resource "aws_ecs_task_definition" "gatus" {
   task_role_arn            = aws_iam_role.gatus.arn
   execution_role_arn       = var.execution_role_arn
 
-  container_definitions = templatefile("${path.module}/templates/gatus.tpl", {
-    image       = var.image
-    cpu         = var.cpu
-    memory      = var.memory
-    name        = "${local.name}-gatus"
-    log_group   = var.log_group != null ? var.log_group.arn : ""
-    region      = var.log_group != null ? var.log_group.region : ""
-    database    = var.database
-    config_path = var.config_path
-  })
+  container_definitions = jsonencode([
+    merge(
+      {
+        name = "${local.name}-gatus"
+        image = var.image
+        cpu = var.cpu
+        memory = var.memory
+        networkMode = "awsvpc"
+        portMappings = [
+          {
+            "containerPort" = 8080
+            "hostPort" = 8080
+            protocol = "tcp"
+          }
+        ]
+        environment = [
+          for key, value in local.env_vars :
+          {
+            name = key
+            value = value
+          }
+        ]
+        secrets = [
+          for key, value in local.secrets :
+          {
+            name = key
+            valueFrom = value
+          }
+        ]
+        placementStrategy = [
+          {
+            field = "attribute:ecs.availability-zone",
+            type = "spread"
+          }
+        ]
+      },
+      var.log_group != null ? {
+        logConfiguration = {
+          logDriver = "awslogs"
+          options = {
+            awslogs-group = var.log_group.arn
+            awslogs-region = var.log_group.region
+            awslogs-stream-prefix = "${local.name}-gatus"
+          }
+        }
+      } : {}
+    )
+  ])
 }
 
 resource "aws_security_group" "gatus" {
