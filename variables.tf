@@ -155,3 +155,15 @@ variable "database" {
   })
   default = null
 }
+
+variable "env_vars" {
+  description = "(Optional) Map of environment variables to add to the container. This can be referenced in the Gatus config files. e.g. `{ FRONT_END = \"https://example.com\" }`"
+  type = map(string)
+  default = {}
+}
+
+variable "secrets" {
+  description = "(Optional) Map of secrets to add to the container. The values should be ARNs for Secrets Manager or SSM Parameter Store"
+  type = map(string)
+  default = {}
+}
