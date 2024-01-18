@@ -1,3 +1,11 @@
+/**
+ * ## Terraform Module Documentation
+ *
+ * This documentation is generated using https://terraform-docs.io
+ *
+ * To update these docs run `terraform-docs .` from this directory.
+ */
+
 locals {
   env_vars = merge(
     {
