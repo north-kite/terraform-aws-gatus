@@ -15,6 +15,17 @@ resource "aws_security_group_rule" "gatus_alb_ingress" {
   cidr_blocks       = var.alb_listener_config.allowed_cidr_blocks
 }
 
+resource "aws_security_group_rule" "gatus_alb_ingress_http_redirect" {
+  count             = var.alb_listener_config.protocol == "HTTPS" ? 1 : 0
+  description       = "Allow HTTP traffic to reach ALB to be redirected to HTTPS"
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  security_group_id = aws_security_group.gatus_alb[0].id
+  cidr_blocks       = var.alb_listener_config.allowed_cidr_blocks
+}
+
 resource "aws_security_group_rule" "gatus_alb_egress" {
   description              = "ALB to Gatus container traffic"
   type                     = "egress"
@@ -50,6 +61,23 @@ resource "aws_lb_listener" "alb" {
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.alb.arn
+  }
+}
+
+resource "aws_lb_listener" "http_redirect" {
+  count             = var.alb_listener_config.protocol == "HTTPS" ? 1 : 0
+  load_balancer_arn = var.alb == null ? aws_lb.alb[0].arn : var.alb.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type = "redirect"
+
+    redirect {
+      port        = var.alb_listener_config.port
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
   }
 }
 
