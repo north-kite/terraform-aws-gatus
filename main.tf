@@ -13,20 +13,20 @@ locals {
     },
     var.env_vars,
     var.database != null ? (
-    {
-      DB_HOST = var.database.host
-      DB_PORT = var.database.port
-      DB_NAME = var.database.name
-    }
+      {
+        DB_HOST = var.database.host
+        DB_PORT = var.database.port
+        DB_NAME = var.database.name
+      }
     ) : {},
   )
   secrets = merge(
     var.secrets,
     var.database != null ? (
-    {
-      DB_USER = var.database.user_arn
-      DB_PASSWORD = var.database.password_arn
-    }
+      {
+        DB_USER     = var.database.user_arn
+        DB_PASSWORD = var.database.password_arn
+      }
     ) : {},
   )
 }
@@ -43,36 +43,36 @@ resource "aws_ecs_task_definition" "gatus" {
   container_definitions = jsonencode([
     merge(
       {
-        name = "${local.name}-gatus"
-        image = var.image
-        cpu = var.cpu
-        memory = var.memory
+        name        = "${local.name}-gatus"
+        image       = var.image
+        cpu         = var.cpu
+        memory      = var.memory
         networkMode = "awsvpc"
         portMappings = [
           {
             "containerPort" = 8080
-            "hostPort" = 8080
-            protocol = "tcp"
+            "hostPort"      = 8080
+            protocol        = "tcp"
           }
         ]
         environment = [
           for key, value in local.env_vars :
           {
-            name = key
+            name  = key
             value = value
           }
         ]
         secrets = [
           for key, value in local.secrets :
           {
-            name = key
+            name      = key
             valueFrom = value
           }
         ]
         placementStrategy = [
           {
             field = "attribute:ecs.availability-zone",
-            type = "spread"
+            type  = "spread"
           }
         ]
       },
@@ -80,8 +80,8 @@ resource "aws_ecs_task_definition" "gatus" {
         logConfiguration = {
           logDriver = "awslogs"
           options = {
-            awslogs-group = var.log_group.arn
-            awslogs-region = var.log_group.region
+            awslogs-group         = var.log_group.arn
+            awslogs-region        = var.log_group.region
             awslogs-stream-prefix = "${local.name}-gatus"
           }
         }
