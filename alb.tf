@@ -60,12 +60,12 @@ resource "aws_lb_target_group" "alb" {
   vpc_id      = var.vpc_id
   target_type = "ip"
 
-  ## TODO - check if Gatus has a Health check endpoint. Health check currently failing
   health_check {
     healthy_threshold   = 4
     unhealthy_threshold = 10 # TODO: tune
     interval            = 60
-    port                = 8080 # TODO move gatus port to a local?
+    path                = "/health"
+    port                = 8080
     protocol            = "HTTP"
   }
 
