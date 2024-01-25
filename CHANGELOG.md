@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/north-kite/terraform-aws-gatus/compare/v1.0.1...v1.0.2) (2024-01-25)
+
+
+### Bug Fixes
+
+* correct protocol between ALB and app ([f030623](https://github.com/north-kite/terraform-aws-gatus/commit/f030623fc77194d6686a3436c23adf1b83a50717))
+
 ## 1.0.0 (2024-01-18)
 
 
