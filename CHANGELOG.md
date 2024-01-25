@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.0](https://github.com/north-kite/terraform-aws-gatus/compare/v1.0.2...v1.1.0) (2024-01-25)
+
+
+### Features
+
+* if listener protocol is HTTPS, then create redirect from HTTP to HTTPS ([b2029c4](https://github.com/north-kite/terraform-aws-gatus/commit/b2029c451520710ace80c56e3ae2c5d0c9e4f806))
+* use `/health` path for health checks ([7d107d4](https://github.com/north-kite/terraform-aws-gatus/commit/7d107d4805a4a442c3531baf63a2617d99d30fee))
+
 ## [1.0.2](https://github.com/north-kite/terraform-aws-gatus/compare/v1.0.1...v1.0.2) (2024-01-25)
 
 
