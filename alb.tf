@@ -56,7 +56,7 @@ resource "aws_lb_listener" "alb" {
 resource "aws_lb_target_group" "alb" {
   name_prefix = "gatus"
   port        = 8080
-  protocol    = var.alb_listener_config.protocol
+  protocol    = "HTTP"
   vpc_id      = var.vpc_id
   target_type = "ip"
 
